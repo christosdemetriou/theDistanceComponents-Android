@@ -12,7 +12,7 @@ import uk.co.thedistance.components.lists.interfaces.ListAdapter;
 import uk.co.thedistance.components.lists.interfaces.ListItemPresenter;
 import uk.co.thedistance.components.lists.interfaces.Listable;
 
-public class RecyclerListAdapter<T extends Listable<T>> extends RecyclerView.Adapter<ViewHolder> implements ListAdapter<T> {
+public class RecyclerListAdapter<T extends Listable> extends RecyclerView.Adapter<ViewHolder> implements ListAdapter<T> {
 
     final ListItemPresenter<T> itemPresenter;
     SortedList<Listable> items = new SortedList<>(Listable.class, new SortedList.Callback<Listable>() {

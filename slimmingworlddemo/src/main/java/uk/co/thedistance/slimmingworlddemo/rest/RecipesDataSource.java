@@ -9,13 +9,13 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import uk.co.thedistance.components.lists.ListContent;
 import uk.co.thedistance.components.lists.interfaces.ListDataSource;
 import uk.co.thedistance.slimmingworlddemo.rest.model.Recipe;
 
 public class RecipesDataSource implements ListDataSource<Recipe> {
 
     boolean vegetarian = false;
-    Context context;
     SlimmingWorldData.SlimmingWorldDataClient client;
 
     public RecipesDataSource(Context context, boolean vegetarian) {
@@ -24,7 +24,17 @@ public class RecipesDataSource implements ListDataSource<Recipe> {
     }
 
     @Override
-    public Observable<List<Recipe>> getData(boolean refresh) {
+    public void contentDelivered(List<Recipe> items) {
+
+    }
+
+    @Override
+    public boolean isListComplete() {
+        return false;
+    }
+
+    @Override
+    public Observable<ListContent<Recipe>> getData(boolean refresh) {
         return client.getRecipes()
                 .flatMap(new Func1<List<Recipe>, Observable<Recipe>>() {
                     @Override
@@ -37,20 +47,16 @@ public class RecipesDataSource implements ListDataSource<Recipe> {
                     public Boolean call(Recipe recipe) {
                         return !vegetarian || recipe.vegetarian;
                     }
-                }).toList()
+                })
+                .toList()
+                .map(new Func1<List<Recipe>, ListContent<Recipe>>() {
+                    @Override
+                    public ListContent<Recipe> call(List<Recipe> recipes) {
+                        return new ListContent<Recipe>(recipes, true);
+                    }
+                })
                 .delay(2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-
-    }
-
-    @Override
-    public void contentDelivered(List<Recipe> items) {
-
-    }
-
-    @Override
-    public boolean isListComplete() {
-        return false;
     }
 }

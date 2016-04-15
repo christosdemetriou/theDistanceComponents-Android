@@ -16,9 +16,11 @@ import android.view.ViewTreeObserver;
 
 import java.util.List;
 
+import uk.co.thedistance.components.ContentLoadingPresenterView;
 import uk.co.thedistance.components.PresenterFactory;
 import uk.co.thedistance.components.PresenterLoader;
 import uk.co.thedistance.components.databinding.ItemBaseBinding;
+import uk.co.thedistance.components.lists.ListContent;
 import uk.co.thedistance.components.lists.ListPresenter;
 import uk.co.thedistance.components.lists.RecyclerListAdapter;
 import uk.co.thedistance.components.lists.interfaces.ListItemPresenter;
@@ -65,32 +67,15 @@ public class RecipesActivity extends AppCompatActivity implements LoaderManager.
     }
 
     @Override
-    public Loader<ListPresenter<Recipe>> onCreateLoader(int id, Bundle args) {
-        return new PresenterLoader<>(this, new RecipesPresenterFactory());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<ListPresenter<Recipe>> loader, ListPresenter<Recipe> data) {
-        presenter = data;
-    }
-
-    @Override
-    public void onLoaderReset(Loader<ListPresenter<Recipe>> loader) {
-        presenter.onDestroyed();
-        presenter = null;
-    }
-
-    @Override
     public void showLoading(boolean show) {
         binding.refreshLayout.setRefreshing(show);
     }
 
     @Override
-    public void showResults(List<Recipe> results, boolean shouldClear) {
-        if (shouldClear) {
-            adapter.clear();
+    public void showContent(ListContent<Recipe> content) {
+        if (content.shouldClear) {
+            adapter.addItems(content.items);
         }
-        adapter.addItems(results);
     }
 
     @Override
@@ -107,6 +92,22 @@ public class RecipesActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public void showEmpty(boolean show) {
         binding.emptyText.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public Loader<ListPresenter<Recipe>> onCreateLoader(int id, Bundle args) {
+        return new PresenterLoader<>(this, new RecipesPresenterFactory());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ListPresenter<Recipe>> loader, ListPresenter<Recipe> data) {
+        presenter = data;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ListPresenter<Recipe>> loader) {
+        presenter.onDestroyed();
+        presenter = null;
     }
 
     class RecipesPresenterFactory implements PresenterFactory<ListPresenter<Recipe>> {

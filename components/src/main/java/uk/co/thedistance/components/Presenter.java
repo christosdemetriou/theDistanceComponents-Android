@@ -4,7 +4,7 @@
 
 package uk.co.thedistance.components;
 
-public interface Presenter<T extends PresenterView> {
+public interface Presenter<T extends ContentLoadingPresenterView> {
 
     void onViewAttached(T view);
     void onViewDetached();

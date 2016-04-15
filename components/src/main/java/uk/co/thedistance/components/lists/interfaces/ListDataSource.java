@@ -2,11 +2,11 @@ package uk.co.thedistance.components.lists.interfaces;
 
 import java.util.List;
 
-import rx.Observable;
+import uk.co.thedistance.components.DataSource;
+import uk.co.thedistance.components.lists.ListContent;
 
-public interface ListDataSource<T extends Listable> {
+public interface ListDataSource<T extends Listable> extends DataSource<ListContent<T>> {
 
-    Observable<List<T>> getData(boolean refresh);
     void contentDelivered(List<T> items);
 
     boolean isListComplete();
