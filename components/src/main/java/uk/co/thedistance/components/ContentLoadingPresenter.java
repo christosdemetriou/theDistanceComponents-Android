@@ -4,24 +4,23 @@ import android.util.Log;
 
 import rx.Subscriber;
 import rx.Subscription;
-import uk.co.thedistance.components.lists.interfaces.Listable;
 
-public class ContentLoadingPresenter<T> implements Presenter<ContentLoadingPresenterView<T>> {
+public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends ContentLoadingPresenterView<T>> implements Presenter<PV> {
 
-    ContentLoadingPresenterView<T> view;
+    protected PV view;
     protected T content;
-    DataSource<T> dataSource;
-    private Subscription dataSubscription;
+    DS dataSource;
+    protected Subscription dataSubscription;
 
-    public ContentLoadingPresenter(DataSource<T> dataSource) {
+    public ContentLoadingPresenter(DS dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public void onViewAttached(ContentLoadingPresenterView<T> view) {
+    public void onViewAttached(PV view) {
         this.view = view;
         if (content != null) {
-            view.showContent(content);
+            view.showContent(content, true);
         } else {
             loadContent(true);
         }
@@ -37,12 +36,19 @@ public class ContentLoadingPresenter<T> implements Presenter<ContentLoadingPrese
         unsubscribe();
     }
 
+    public void setDataSource(DS dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public void loadContent(final boolean refresh) {
         unsubscribe();
 
-        view.showLoading(true);
+        if (refresh) {
+            dataSource.reset();
+        }
+        view.showLoading(true, refresh);
 
-        dataSubscription = dataSource.getData(refresh)
+        dataSubscription = dataSource.getData()
                 .subscribe(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
@@ -52,15 +58,15 @@ public class ContentLoadingPresenter<T> implements Presenter<ContentLoadingPrese
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Error: ", e.getLocalizedMessage());
-                        view.showLoading(false);
+                        view.showLoading(false, refresh);
                         view.showError(e.getLocalizedMessage());
                     }
 
                     @Override
                     public void onNext(T content) {
                         keepContent(content);
-                        view.showLoading(false);
-                        view.showContent(content);
+                        view.showContent(content, refresh);
+                        view.showLoading(false, refresh);
                     }
                 });
     }

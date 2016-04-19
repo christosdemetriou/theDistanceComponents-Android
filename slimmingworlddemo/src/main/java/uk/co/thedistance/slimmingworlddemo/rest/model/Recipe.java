@@ -8,13 +8,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-import uk.co.thedistance.components.lists.interfaces.Listable;
-
 /**
  * make sure you use UPPER_CAMEL_CASE FieldNamingPolicy
  * Created by pharris on 08/12/14.
  */
-public class Recipe implements Parcelable, Listable<Recipe> {
+public class Recipe implements Parcelable, ListSortable {
     public String title;
     public String pageName;
     public String globalIntroduction;
@@ -36,22 +34,20 @@ public class Recipe implements Parcelable, Listable<Recipe> {
     public ArrayList<Icon> icons;
 
     @Override
-    public Listable.Properties getProperties() {
-        return new Listable.Properties(title, shortIntro, pageName, null);
+    public boolean isSameItem(ListSortable other) {
+        if (!(other instanceof Recipe)) {
+            return false;
+        }
+        return recipeCode.equals(((Recipe) other).recipeCode);
     }
 
     @Override
-    public boolean isSameItem(Recipe other) {
-        return recipeCode.equals(other.recipeCode);
-    }
-
-    @Override
-    public boolean isSameContent(Recipe other) {
+    public boolean isSameContent(ListSortable other) {
         return equals(other);
     }
 
     @Override
-    public int compareTo(Recipe another) {
+    public int compareTo(ListSortable another) {
         return 0;
     }
 

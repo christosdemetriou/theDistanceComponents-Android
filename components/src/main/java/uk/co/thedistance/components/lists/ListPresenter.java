@@ -3,12 +3,13 @@ package uk.co.thedistance.components.lists;
 import java.util.ArrayList;
 
 import uk.co.thedistance.components.ContentLoadingPresenter;
-import uk.co.thedistance.components.DataSource;
-import uk.co.thedistance.components.lists.interfaces.Listable;
+import uk.co.thedistance.components.lists.interfaces.ListDataSource;
+import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
 
-public class ListPresenter<T extends Listable> extends ContentLoadingPresenter<ListContent<T>> {
+public class ListPresenter<T, DS extends ListDataSource<T>> extends ContentLoadingPresenter<ListContent<T>, DS, ListPresenterView<T>> {
 
-    public ListPresenter(DataSource<ListContent<T>> dataSource) {
+
+    public ListPresenter(DS dataSource) {
         super(dataSource);
     }
 
@@ -23,5 +24,6 @@ public class ListPresenter<T extends Listable> extends ContentLoadingPresenter<L
         }
         this.content.items.addAll(content.items);
 
+        view.showEmpty(this.content.items.isEmpty());
     }
 }

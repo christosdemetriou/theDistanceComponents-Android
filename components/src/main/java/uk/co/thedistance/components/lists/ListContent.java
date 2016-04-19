@@ -2,9 +2,7 @@ package uk.co.thedistance.components.lists;
 
 import java.util.List;
 
-import uk.co.thedistance.components.lists.interfaces.Listable;
-
-public class ListContent<T extends Listable> {
+public class ListContent<T> {
 
     public List<T> items;
     public boolean shouldClear;

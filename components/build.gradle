@@ -29,4 +29,5 @@ dependencies {
     compile 'com.android.support:support-v4:23.3.0'
     compile 'com.android.support:recyclerview-v7:23.3.0'
     compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'com.hannesdorfmann:adapterdelegates2:2.0.0'
 }

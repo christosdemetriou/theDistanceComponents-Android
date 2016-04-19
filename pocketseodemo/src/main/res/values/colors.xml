@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0071bc</color>
+    <color name="colorPrimaryDark">#1b1364</color>
+    <color name="colorAccent">#fbb03b</color>
+    <color name="colorBackground">#EDEDED</color>
+    <color name="white">#ffffff</color>
+    <color name="spam_medium">#FF9800</color>
+    <color name="spam_bad">#F44336</color>
+    <color name="spam_good">#4CAF50</color>
+    <color name="item_background">#fafafa</color>
+    <color name="white87">#deffffff</color>
+    <color name="black87">#de000000</color>
+    <color name="black54">#8a000000</color>
+    <color name="black20">#33000000</color>
+    <color name="black_overlay">#5b000000</color>
+</resources>

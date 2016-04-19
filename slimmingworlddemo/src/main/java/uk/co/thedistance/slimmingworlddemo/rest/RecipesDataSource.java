@@ -24,17 +24,17 @@ public class RecipesDataSource implements ListDataSource<Recipe> {
     }
 
     @Override
-    public void contentDelivered(List<Recipe> items) {
-
-    }
-
-    @Override
     public boolean isListComplete() {
-        return false;
+        return true;
     }
 
     @Override
-    public Observable<ListContent<Recipe>> getData(boolean refresh) {
+    public void reset() {
+
+    }
+
+    @Override
+    public Observable<ListContent<Recipe>> getData() {
         return client.getRecipes()
                 .flatMap(new Func1<List<Recipe>, Observable<Recipe>>() {
                     @Override
