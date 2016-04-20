@@ -14,13 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-import uk.co.thedistance.components.PresenterFactory;
-import uk.co.thedistance.components.PresenterLoader;
+import uk.co.thedistance.components.base.PresenterFactory;
+import uk.co.thedistance.components.base.PresenterLoader;
+import uk.co.thedistance.components.base.PresenterLoaderHelper;
 import uk.co.thedistance.components.lists.AbsSortedListItemAdapterDelegate;
 import uk.co.thedistance.components.lists.BindingViewHolder;
-import uk.co.thedistance.components.lists.EndlessListPresenter;
-import uk.co.thedistance.components.lists.ListContent;
-import uk.co.thedistance.components.lists.SortedRecyclerListAdapter;
+import uk.co.thedistance.components.lists.presenter.EndlessListPresenter;
+import uk.co.thedistance.components.lists.model.ListContent;
+import uk.co.thedistance.components.lists.SortedListDelegationAdapter;
 import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
 import uk.co.thedistance.components.pocketseodemo.databinding.ActivityLinksBinding;
 import uk.co.thedistance.components.pocketseodemo.databinding.ItemLinkBinding;
@@ -29,10 +30,11 @@ import uk.co.thedistance.components.pocketseodemo.model.DataRepository;
 import uk.co.thedistance.components.pocketseodemo.model.MozScapeLink;
 import uk.co.thedistance.components.pocketseodemo.viewmodel.MozScapeLinkViewModel;
 
-public class LinksActivity extends AppCompatActivity implements ListPresenterView<MozScapeLink>, LoaderManager.LoaderCallbacks<EndlessListPresenter<MozScapeLink, LinksDataSource>> {
+public class LinksActivity extends AppCompatActivity implements ListPresenterView<MozScapeLink> {
 
 
     private ActivityLinksBinding binding;
+    private PresenterLoaderHelper<EndlessListPresenter<MozScapeLink, LinksDataSource>> loaderHelper;
     private EndlessListPresenter<MozScapeLink, LinksDataSource> presenter;
     private LinksAdapter adapter;
 
@@ -42,7 +44,8 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_links);
 
-        getSupportLoaderManager().initLoader(0, null, this);
+        loaderHelper = new PresenterLoaderHelper<>(this, new LinksPresenterLoaderFactory());
+        getSupportLoaderManager().initLoader(0, null, loaderHelper);
 
         binding.swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -57,6 +60,8 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
     @Override
     protected void onResume() {
         super.onResume();
+
+        presenter = loaderHelper.getPresenter();
 
         binding.swipeRefresh.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -94,22 +99,6 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     }
 
-    @Override
-    public Loader<EndlessListPresenter<MozScapeLink, LinksDataSource>> onCreateLoader(int id, Bundle args) {
-        return new PresenterLoader<>(this, new LinksPresenterLoaderFactory());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<EndlessListPresenter<MozScapeLink, LinksDataSource>> loader, EndlessListPresenter<MozScapeLink, LinksDataSource> data) {
-        presenter = data;
-    }
-
-    @Override
-    public void onLoaderReset(Loader<EndlessListPresenter<MozScapeLink, LinksDataSource>> loader) {
-        presenter.onDestroyed();
-        presenter = null;
-    }
-
     class LinksPresenterLoaderFactory implements PresenterFactory<EndlessListPresenter<MozScapeLink, LinksDataSource>> {
 
         @Override
@@ -138,7 +127,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     }
 
-    class LinksAdapter extends SortedRecyclerListAdapter<Object> {
+    class LinksAdapter extends SortedListDelegationAdapter<Object> {
 
         LoadingItem loadingItem = new LoadingItem();
 
@@ -158,7 +147,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         }
     }
 
-    class ItemSorter implements SortedRecyclerListAdapter.Sorter<Object> {
+    class ItemSorter implements SortedListDelegationAdapter.Sorter<Object> {
 
         @Override
         public boolean areItemsTheSame(Object lhs, Object rhs) {

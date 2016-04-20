@@ -17,13 +17,13 @@ import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
 
-import uk.co.thedistance.components.PresenterFactory;
-import uk.co.thedistance.components.PresenterLoader;
+import uk.co.thedistance.components.base.PresenterFactory;
+import uk.co.thedistance.components.base.PresenterLoader;
 import uk.co.thedistance.components.lists.AbsSortedListItemAdapterDelegate;
 import uk.co.thedistance.components.lists.BindingViewHolder;
-import uk.co.thedistance.components.lists.ListContent;
-import uk.co.thedistance.components.lists.ListPresenter;
-import uk.co.thedistance.components.lists.SortedRecyclerListAdapter;
+import uk.co.thedistance.components.lists.model.ListContent;
+import uk.co.thedistance.components.lists.presenter.ListPresenter;
+import uk.co.thedistance.components.lists.SortedListDelegationAdapter;
 import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
 import uk.co.thedistance.slimmingworlddemo.R;
 import uk.co.thedistance.slimmingworlddemo.databinding.ActivityRecipesBinding;
@@ -36,7 +36,7 @@ public class RecipesActivity extends AppCompatActivity implements LoaderManager.
 
     private ListPresenter<Recipe, RecipesDataSource> presenter;
     private ActivityRecipesBinding binding;
-    private SortedRecyclerListAdapter<ListSortable> adapter;
+    private SortedListDelegationAdapter<ListSortable> adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,7 +128,7 @@ public class RecipesActivity extends AppCompatActivity implements LoaderManager.
         }
     }
 
-    class RecipesAdapter extends SortedRecyclerListAdapter<ListSortable> {
+    class RecipesAdapter extends SortedListDelegationAdapter<ListSortable> {
 
         public RecipesAdapter() {
             super(ListSortable.class, sorter);

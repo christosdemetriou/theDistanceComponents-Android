@@ -1,10 +1,11 @@
-package uk.co.thedistance.components.lists;
+package uk.co.thedistance.components.lists.presenter;
 
 import java.util.ArrayList;
 
-import uk.co.thedistance.components.ContentLoadingPresenter;
+import uk.co.thedistance.components.contentloading.ContentLoadingPresenter;
 import uk.co.thedistance.components.lists.interfaces.ListDataSource;
 import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
+import uk.co.thedistance.components.lists.model.ListContent;
 
 public class ListPresenter<T, DS extends ListDataSource<T>> extends ContentLoadingPresenter<ListContent<T>, DS, ListPresenterView<T>> {
 

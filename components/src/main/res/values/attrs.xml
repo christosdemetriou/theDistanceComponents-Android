@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="AspectImageView">
+        <attr name="cropType" format="integer">
+            <flag name="top" value="1"/>
+            <flag name="bottom" value="2"/>
+            <flag name="left" value="4"/>
+            <flag name="right" value="8"/>
+        </attr>
+        <attr name="ratio" format="integer">
+            <flag name="wide" value="0"/>
+            <flag name="four_three" value="1"/>
+            <flag name="three_two" value="2"/>
+            <flag name="square" value="3"/>
+        </attr>
+        <attr name="ratioValue" format="float"/>
+        <attr name="maxWidth" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="ForegroundAspectImageView">
+        <attr name="android:foreground"/>
+    </declare-styleable>
+
+    <declare-styleable name="TimeLineView">
+        <attr name="tl_barColor" format="color" />
+        <attr name="tl_barWidth" format="dimension" />
+        <attr name="tl_showMidPoints" format="boolean" />
+        <attr name="tl_startHour" format="integer"/>
+        <attr name="tl_endHour" format="integer"/>
+        <attr name="tl_textAppearance" format="reference"/>
+        <attr name="tl_timeZone" format="string"/>
+        <attr name="android:textSize"/>
+        <attr name="android:textColor"/>
+    </declare-styleable>
+</resources>

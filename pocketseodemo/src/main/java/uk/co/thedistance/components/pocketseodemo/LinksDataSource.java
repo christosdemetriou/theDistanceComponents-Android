@@ -6,7 +6,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import uk.co.thedistance.components.lists.ListContent;
+import uk.co.thedistance.components.lists.model.ListContent;
 import uk.co.thedistance.components.lists.interfaces.ListDataSource;
 import uk.co.thedistance.components.pocketseodemo.model.DataRepository;
 import uk.co.thedistance.components.pocketseodemo.model.MozScapeLink;
