@@ -15,17 +15,9 @@ import uk.co.thedistance.components.base.TheDistanceActivity;
  */
 abstract public class AnalyticsActivity extends TheDistanceActivity {
 
-    private String screenName;
+    protected abstract String getScreenName();
 
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
-    }
-
-    public void setScreenAnalyticsDisabled(boolean screenAnalyticsDisabled) {
-        this.screenAnalyticsDisabled = screenAnalyticsDisabled;
-    }
-
-    private boolean screenAnalyticsDisabled;
+    protected abstract boolean isTrackingEnabled();
 
     @Override
     protected void onResume() {
@@ -40,11 +32,11 @@ abstract public class AnalyticsActivity extends TheDistanceActivity {
     }
 
     protected void sendScreen() {
-        if (screenAnalyticsDisabled) {
+        if (!isTrackingEnabled()) {
             return;
         }
 
-        Analytics.sendScreen(this, screenName);
+        Analytics.sendScreen(this, getScreenName());
     }
 
     protected void sendEvent(AnalyticEvent event) {

@@ -15,26 +15,9 @@ import uk.co.thedistance.components.analytics.model.AnalyticEvent;
  */
 public abstract class AnalyticsFragment extends Fragment {
 
-    /**
-     * Set the screen name to be sent to analytics (if enabled)
-     *
-     * @param screenName The name of the screen
-     */
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
-    }
+    abstract String getScreenName();
 
-    public void setScreenAnalyticsDisabled(boolean screenAnalyticsDisabled) {
-        this.screenAnalyticsDisabled = screenAnalyticsDisabled;
-    }
-
-    private String screenName = null;
-
-    public boolean isScreenAnalyticsDisabled() {
-        return screenAnalyticsDisabled;
-    }
-
-    private boolean screenAnalyticsDisabled = false;
+    abstract boolean isTrackingEnabled();
 
     @Override
     public void onResume() {
@@ -55,11 +38,11 @@ public abstract class AnalyticsFragment extends Fragment {
     }
 
     protected void sendScreen(boolean newSession) {
-        if (screenAnalyticsDisabled) {
+        if (!isTrackingEnabled()) {
             return;
         }
         // Send screen if fragment still visible (to avoid sending home every time backstack cleared)
-        Analytics.sendScreen(getActivity(), screenName, newSession);
+        Analytics.sendScreen(getActivity(), getScreenName(), newSession);
     }
 
     protected void sendEvent(AnalyticEvent event) {

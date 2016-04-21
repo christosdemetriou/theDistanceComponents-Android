@@ -19,7 +19,7 @@ public abstract class AnalyticsPagerFragment extends AnalyticsFragment {
     protected void sendScreen() {
         super.sendScreen();
 
-        if (isScreenAnalyticsDisabled()) {
+        if (!isTrackingEnabled()) {
             return;
         }
 
