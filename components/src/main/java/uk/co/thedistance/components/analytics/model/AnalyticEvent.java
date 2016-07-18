@@ -5,8 +5,6 @@ public class AnalyticEvent {
     public String action;
     public String label;
 
-    public boolean startNewSession;
-
     public AnalyticEvent() {
     }
 

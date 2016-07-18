@@ -1,26 +1,18 @@
 package uk.co.thedistance.components.analytics;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import uk.co.thedistance.components.analytics.interfaces.AnalyticsApplication;
+import uk.co.thedistance.components.analytics.interfaces.AnalyticsTracker;
 import uk.co.thedistance.components.analytics.model.AnalyticEvent;
+import uk.co.thedistance.components.analytics.model.AnalyticSession;
+import uk.co.thedistance.components.analytics.model.ScreenEvent;
 import uk.co.thedistance.components.analytics.model.TimingEvent;
 
 /**
- * Helper class for Google Analytics events and screen views.
+ * Helper class for Analytics events and screen views.
  * <p>
- * Apps using this class must implement {@link AnalyticsApplication} in their {@link Application}
- * class in order to configure a {@link Tracker} and provide any custom dimensions
  *
  * @author benbaggley
  */
@@ -29,117 +21,56 @@ public class Analytics {
     public static final String PREFS_FIELD_SEND_USAGE = "send_usage";
     private static final String PREFS_FIELD_LAST_SCREEN = "last_screen";
 
-    private static String sCurrentScreen;
-    private static SharedPreferences sPreferences;
+    private String sCurrentScreen;
+    private SharedPreferences sPreferences;
 
-    public static AnalyticsApplication getApp(Context context) {
-        Application application = (Application) context.getApplicationContext();
-        if (application instanceof AnalyticsApplication) {
-            return (AnalyticsApplication) application;
-        }
-        throw new IllegalArgumentException("Application class must implement AnalyticsApplication");
+    private final AnalyticsTracker tracker;
+    private boolean enabled = true;
+
+    public Analytics(Application application, AnalyticsTracker tracker) {
+        this.tracker = tracker;
+        this.sPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
 
-    public static Tracker getTracker(Context context) {
-        return getApp(context).getTracker();
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
-    public static HashMap<Integer, String> getCustomDimensions(Context context) {
-        return getApp(context).getCustomDimensions();
+    public void newSession(AnalyticSession session) {
+        tracker.setSession(session);
     }
 
-    public static void send(Context context, Map<String, String> eventMap) {
-        Tracker tracker = getTracker(context);
-        if (tracker != null) {
-            tracker.send(eventMap);
-        }
-    }
-
-    public static void send(Context context, AnalyticEvent event) {
-        HitBuilders.EventBuilder builder = new HitBuilders.EventBuilder()
-                .setCategory(event.category)
-                .setAction(event.action)
-                .setLabel(event.label);
-
-        if (event.startNewSession) {
-            builder.setNewSession();
+    public void send(AnalyticEvent event) {
+        if (!enabled) {
+            return;
         }
 
-        HashMap<Integer, String> dimensions = getCustomDimensions(context);
-        if (dimensions != null) {
-            for (int key : dimensions.keySet()) {
-                builder.setCustomDimension(key, dimensions.get(key));
-            }
-        }
-
-        send(context, builder.build());
+        tracker.sendEvent(event);
     }
 
-    public static void send(Context context, TimingEvent event) {
-        HitBuilders.TimingBuilder builder = new HitBuilders.TimingBuilder()
-                .setCategory(event.category)
-                .setLabel(event.label)
-                .setVariable(event.name)
-                .setValue(event.value);
-
-        if (event.startNewSession) {
-            builder.setNewSession();
+    public void send(TimingEvent event) {
+        if (!enabled) {
+            return;
         }
 
-        HashMap<Integer, String> dimensions = getCustomDimensions(context);
-        if (dimensions != null) {
-            for (int key : dimensions.keySet()) {
-                builder.setCustomDimension(key, dimensions.get(key));
-            }
-        }
-
-        send(context, builder.build());
+        tracker.sendTiming(event);
     }
 
-    private static SharedPreferences getPreferences(Context context) {
-        if (sPreferences == null) {
-            sPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        }
-        return sPreferences;
-    }
-
-    public static void sendScreen(Context context, @Nullable String screenName) {
-        sendScreen(context, screenName, false);
-    }
-
-    public static void sendScreen(Context context, @Nullable String screenName, boolean newSession) {
-        if (screenName == null) {
+    public void send(ScreenEvent event) {
+        if (!enabled) {
             return;
         }
         if (sCurrentScreen == null) {
-            sCurrentScreen = getPreferences(context)
+            sCurrentScreen = sPreferences
                     .getString(PREFS_FIELD_LAST_SCREEN, null);
         }
 
-        if (newSession || sCurrentScreen == null || !sCurrentScreen.equals(screenName)) {
-            Tracker tracker = getTracker(context);
-            if (null == tracker) {
-                // user might have opted out so don't send track
-                return;
-            }
+        if (sCurrentScreen == null || !sCurrentScreen.equals(event.getScreenName())) {
 
-            HitBuilders.ScreenViewBuilder builder = new HitBuilders.ScreenViewBuilder();
-            if (newSession) {
-                builder.setNewSession();
-            }
+            tracker.sendScreen(event.getScreenName());
+            sCurrentScreen = event.getScreenName();
 
-            HashMap<Integer, String> dimensions = getCustomDimensions(context);
-            if (dimensions != null) {
-                for (int key : dimensions.keySet()) {
-                    builder.setCustomDimension(key, dimensions.get(key));
-                }
-            }
-
-            tracker.setScreenName(screenName);
-            tracker.send(builder.build());
-            sCurrentScreen = screenName;
-
-            getPreferences(context).edit()
+            sPreferences.edit()
                     .putString(PREFS_FIELD_LAST_SCREEN, sCurrentScreen)
                     .apply();
         }

@@ -6,8 +6,6 @@ public class TimingEvent {
     public String name;
     public long value;
 
-    public boolean startNewSession;
-
     public TimingEvent() {
     }
 
