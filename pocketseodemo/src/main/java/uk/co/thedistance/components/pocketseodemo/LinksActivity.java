@@ -47,12 +47,6 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         loaderHelper = new PresenterLoaderHelper<>(this, new LinksPresenterLoaderFactory());
         getSupportLoaderManager().initLoader(0, null, loaderHelper);
 
-        binding.swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                presenter.loadContent(true);
-            }
-        });
         binding.recycler.setLayoutManager(new LinearLayoutManager(this));
         binding.recycler.setAdapter(adapter = new LinksAdapter());
     }
@@ -62,14 +56,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         super.onResume();
 
         presenter = loaderHelper.getPresenter();
-
-        binding.swipeRefresh.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                binding.swipeRefresh.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                presenter.onViewAttached(LinksActivity.this);
-            }
-        });
+        presenter.onViewAttached(this, binding.swipeRefresh);
     }
 
     @Override
@@ -79,9 +66,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     @Override
     public void showLoading(boolean show, boolean isRefresh) {
-        if (isRefresh) {
-            binding.swipeRefresh.setRefreshing(show);
-        } else {
+        if (!isRefresh) {
             adapter.showLoading(show);
         }
     }
@@ -99,7 +84,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     }
 
-    class LinksPresenterLoaderFactory implements PresenterFactory<EndlessListPresenter<MozScapeLink, LinksDataSource>> {
+    private class LinksPresenterLoaderFactory implements PresenterFactory<EndlessListPresenter<MozScapeLink, LinksDataSource>> {
 
         @Override
         public EndlessListPresenter<MozScapeLink, LinksDataSource> create() {
@@ -111,14 +96,14 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     class LinkViewHolder extends BindingViewHolder<ItemLinkBinding> {
 
-        public LinkViewHolder(ItemLinkBinding binding) {
+        LinkViewHolder(ItemLinkBinding binding) {
             super(binding);
         }
     }
 
     class LoadingViewHolder extends BindingViewHolder<ItemLoadingBinding> {
 
-        public LoadingViewHolder(ItemLoadingBinding binding) {
+        LoadingViewHolder(ItemLoadingBinding binding) {
             super(binding);
         }
     }
@@ -127,11 +112,11 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
 
     }
 
-    class LinksAdapter extends SortedListDelegationAdapter<Object> {
+    private class LinksAdapter extends SortedListDelegationAdapter<Object> {
 
         LoadingItem loadingItem = new LoadingItem();
 
-        public LinksAdapter() {
+        LinksAdapter() {
             super(Object.class, new ItemSorter());
 
             delegatesManager.addDelegate(new LinkAdapterDelegate());
@@ -147,7 +132,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         }
     }
 
-    class ItemSorter implements SortedListDelegationAdapter.Sorter<Object> {
+    private class ItemSorter implements SortedListDelegationAdapter.Sorter<Object> {
 
         @Override
         public boolean areItemsTheSame(Object lhs, Object rhs) {
@@ -165,7 +150,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         }
     }
 
-    class LinkAdapterDelegate extends AbsSortedListItemAdapterDelegate<MozScapeLink, Object, LinkViewHolder> {
+    private class LinkAdapterDelegate extends AbsSortedListItemAdapterDelegate<MozScapeLink, Object, LinkViewHolder> {
 
         @Override
         protected boolean isForViewType(@NonNull Object item, SortedList<Object> items, int position) {
@@ -186,7 +171,7 @@ public class LinksActivity extends AppCompatActivity implements ListPresenterVie
         }
     }
 
-    class LoadingAdapterDelegate extends AbsSortedListItemAdapterDelegate<LoadingItem, Object, LoadingViewHolder> {
+    private class LoadingAdapterDelegate extends AbsSortedListItemAdapterDelegate<LoadingItem, Object, LoadingViewHolder> {
 
         @Override
         protected boolean isForViewType(@NonNull Object item, SortedList<Object> items, int position) {

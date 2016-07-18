@@ -10,7 +10,7 @@ public interface DataSource<T> {
     void reset();
 
     /**
-     * Provide a pre-configured observable, observing on the main thread. Any manipulation of data
+     * Provide a pre-configured observable. Any manipulation of data
      * should be done here
      */
     Observable<T> getData();

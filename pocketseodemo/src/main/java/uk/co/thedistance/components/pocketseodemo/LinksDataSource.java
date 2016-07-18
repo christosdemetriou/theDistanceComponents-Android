@@ -50,7 +50,6 @@ public class LinksDataSource implements ListDataSource<MozScapeLink> {
                         page++;
                         return content;
                     }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                });
     }
 }
