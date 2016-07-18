@@ -1,9 +1,14 @@
 package uk.co.thedistance.components.contentloading;
 
+import android.os.Build;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.ViewTreeObserver;
 
 import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import uk.co.thedistance.components.base.Presenter;
 
 /**
@@ -11,7 +16,7 @@ import uk.co.thedistance.components.base.Presenter;
  * When {@link #onViewAttached(ContentLoadingPresenterView)} is called, content in memory will be delivered;
  * if not available, we will attempt to load from the {@link DataSource}
  *
- * @param <T> The content type to be loaded
+ * @param <T>  The content type to be loaded
  * @param <DS> The {@link DataSource} responsible for loading content
  * @param <PV> The view responsible for displaying content
  */
@@ -21,6 +26,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     protected T content;
     DS dataSource;
     protected Subscription dataSubscription;
+    private SwipeRefreshLayout refreshLayout;
 
     public ContentLoadingPresenter(DS dataSource) {
         this.dataSource = dataSource;
@@ -34,6 +40,27 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
         } else {
             loadContent(true);
         }
+    }
+
+    public void onViewAttached(final PV view, final SwipeRefreshLayout refreshLayout) {
+        this.refreshLayout = refreshLayout;
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadContent(true);
+            }
+        });
+        refreshLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    refreshLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    refreshLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+                onViewAttached(view);
+            }
+        });
     }
 
     @Override
@@ -62,9 +89,11 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
         if (refresh) {
             dataSource.reset();
         }
-        view.showLoading(true, refresh);
+        showLoading(true, refresh);
 
         dataSubscription = dataSource.getData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
@@ -74,7 +103,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Error: ", e.getLocalizedMessage());
-                        view.showLoading(false, refresh);
+                        showLoading(false, refresh);
                         view.showError(e.getLocalizedMessage());
                     }
 
@@ -82,9 +111,18 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                     public void onNext(T content) {
                         keepContent(content);
                         view.showContent(content, refresh);
-                        view.showLoading(false, refresh);
+                        showLoading(false, refresh);
                     }
                 });
+    }
+
+    private void showLoading(boolean show, boolean isRefresh) {
+        if (isRefresh && refreshLayout != null) {
+            refreshLayout.setRefreshing(show);
+            return;
+        }
+
+        view.showLoading(show, isRefresh);
     }
 
     /**
