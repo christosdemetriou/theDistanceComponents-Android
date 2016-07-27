@@ -24,7 +24,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
 
     protected PV view;
     protected T content;
-    DS dataSource;
+    protected DS dataSource;
     protected Subscription dataSubscription;
     private SwipeRefreshLayout refreshLayout;
 

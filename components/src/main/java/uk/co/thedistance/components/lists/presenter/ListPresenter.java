@@ -17,7 +17,7 @@ public class ListPresenter<T, DS extends ListDataSource<T>> extends ContentLoadi
     @Override
     protected void keepContent(ListContent<T> content) {
         if (this.content == null) {
-            this.content = new ListContent<>(new ArrayList<T>(), true);
+            this.content = new ListContent<>(new ArrayList<T>(), false);
         }
 
         if (content.shouldClear) {

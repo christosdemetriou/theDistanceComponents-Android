@@ -2,8 +2,10 @@ package uk.co.thedistance.components.lists.presenter;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import uk.co.thedistance.components.lists.interfaces.ListDataSource;
+import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
 
 /**
  * An implementation of {@link ListPresenter} that uses {@link android.support.v7.widget.RecyclerView.OnScrollListener}
@@ -16,6 +18,7 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
     /**
      * Set the offset (from the bottom of the list) of the item that should be visible for more content to be loaded
      * The default value is 0, i.e. when the last item is visible, more content will be loaded
+     *
      * @param endOffset
      */
     public void setEndOffset(int endOffset) {
@@ -24,22 +27,36 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
 
     private int endOffset = 0;
 
-    public EndlessListPresenter(final DS dataSource, RecyclerView recyclerView) {
+    public EndlessListPresenter(final DS dataSource) {
         super(dataSource);
+    }
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (recyclerView.isAnimating()) {
-                    return;
-                }
-
-                if (!dataSource.isListComplete() && isScrolledToBottom(recyclerView)) {
-                    loadNext();
-                }
+    private final RecyclerView.OnScrollListener SCROLL_LISTENER = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (recyclerView.isAnimating()) {
+                return;
             }
-        });
+
+            if (!dataSource.isListComplete() && isScrolledToBottom(recyclerView)) {
+                loadNext();
+            }
+        }
+    };
+
+    @Override
+    public void onViewAttached(ListPresenterView<T> view) {
+        super.onViewAttached(view);
+
+        view.getRecyclerView().addOnScrollListener(SCROLL_LISTENER);
+    }
+
+    @Override
+    public void onViewDetached() {
+        super.onViewDetached();
+
+        view.getRecyclerView().removeOnScrollListener(SCROLL_LISTENER);
     }
 
     private void loadNext() {
@@ -55,6 +72,16 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
 
         if (layoutManager instanceof LinearLayoutManager) {
             return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition() == recyclerView.getAdapter().getItemCount() - 1 - endOffset;
+        }
+
+        if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] positions = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
+            int end = recyclerView.getAdapter().getItemCount() - 1 - endOffset;
+            for (int i : positions) {
+                if (i == end) {
+                    return true;
+                }
+            }
         }
 
         return false;

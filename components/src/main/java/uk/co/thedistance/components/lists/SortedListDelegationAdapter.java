@@ -5,26 +5,21 @@ import android.support.v7.util.SortedList;
 import com.hannesdorfmann.adapterdelegates2.AbsDelegationAdapter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+import uk.co.thedistance.components.lists.interfaces.Sortable;
 
-public class SortedListDelegationAdapter<T> extends AbsDelegationAdapter<SortedList<T>> {
+
+public class SortedListDelegationAdapter<T extends Sortable> extends AbsDelegationAdapter<SortedList<T>> {
 
     @Override
     public int getItemCount() {
         return items == null ? 0 : items.size();
     }
 
-    public interface Sorter<T> extends Comparator<T> {
-        boolean areItemsTheSame(T lhs, T rhs);
+    final Sorter sorter;
 
-        boolean areContentsTheSame(T lhs, T rhs);
-    }
-
-    final Sorter<T> sorter;
-
-    public SortedListDelegationAdapter(Class<T> clazz, final Sorter<T> sorter) {
+    public SortedListDelegationAdapter(Class<T> clazz, final Sorter sorter) {
         this.sorter = sorter;
         items = new SortedList<T>(clazz, new SortedList.Callback<T>() {
             @Override
@@ -66,6 +61,14 @@ public class SortedListDelegationAdapter<T> extends AbsDelegationAdapter<SortedL
 
     public void addItems(List<? extends T> items) {
         this.items.addAll(new ArrayList<>(items));
+    }
+
+    public void addItem(T item) {
+        this.items.add(item);
+    }
+
+    public void removeItem(T item) {
+        this.items.remove(item);
     }
 
     public void clear() {
