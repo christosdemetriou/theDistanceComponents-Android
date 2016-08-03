@@ -1,11 +1,13 @@
 package uk.co.thedistance.components.lists.presenter;
 
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import uk.co.thedistance.components.lists.interfaces.ListDataSource;
 import uk.co.thedistance.components.lists.interfaces.ListPresenterView;
+import uk.co.thedistance.components.lists.model.ListContent;
 
 /**
  * An implementation of {@link ListPresenter} that uses {@link android.support.v7.widget.RecyclerView.OnScrollListener}
@@ -39,11 +41,15 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
                 return;
             }
 
-            if (!dataSource.isListComplete() && isScrolledToBottom(recyclerView)) {
-                loadNext();
-            }
+            loadNextIfBottom();
         }
     };
+
+    private void loadNextIfBottom() {
+        if (!dataSource.isListComplete() && isScrolledToBottom(view.getRecyclerView())) {
+            loadNext();
+        }
+    }
 
     @Override
     public void onViewAttached(ListPresenterView<T> view) {
@@ -67,6 +73,18 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
         loadContent(false);
     }
 
+    @Override
+    protected void keepContent(ListContent<T> content) {
+        super.keepContent(content);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadNextIfBottom();
+            }
+        }, 400);
+    }
+
     protected boolean isScrolledToBottom(RecyclerView recyclerView) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
@@ -86,4 +104,6 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
 
         return false;
     }
+
+
 }

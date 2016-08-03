@@ -104,7 +104,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                     public void onError(Throwable e) {
                         Log.d("Error: ", e.getLocalizedMessage());
                         showLoading(false, refresh);
-                        view.showError(e.getLocalizedMessage());
+                        view.showError(e, e.getLocalizedMessage());
                     }
 
                     @Override

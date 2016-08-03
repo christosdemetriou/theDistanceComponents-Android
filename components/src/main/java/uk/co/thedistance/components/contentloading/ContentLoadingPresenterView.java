@@ -21,5 +21,5 @@ public interface ContentLoadingPresenterView<T> {
      */
     void showContent(T content, boolean refresh);
 
-    void showError(String error);
+    void showError(Throwable throwable, String error);
 }
