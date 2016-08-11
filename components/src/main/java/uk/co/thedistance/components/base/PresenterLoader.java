@@ -55,7 +55,9 @@ public class PresenterLoader<T extends Presenter> extends Loader<T> {
     protected void onReset() {
         super.onReset();
 
-        presenter.onDestroyed();
-        presenter = null;
+        if (presenter != null) {
+            presenter.onDestroyed();
+            presenter = null;
+        }
     }
 }
