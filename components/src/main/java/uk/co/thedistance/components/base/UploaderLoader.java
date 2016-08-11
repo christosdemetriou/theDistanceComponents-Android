@@ -10,17 +10,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 
+import uk.co.thedistance.components.uploading.UploadingPresenter;
+
 /**
  * An implementation of a synchronous loader, used to instantiate and retain a {@link Presenter}
- * throughout the {@link android.app.Activity} lifecycle
+ * throughout the {@link Activity} lifecycle
  * If called in {@link Activity#onCreate(Bundle)}, uploader will be ready in {@link Activity#onResume()}
- * If called in {@link android.support.v4.app.Fragment#onActivityCreated(Bundle)}, uploader will be ready in {@link Fragment#onResume()}
+ * If called in {@link Fragment#onActivityCreated(Bundle)}, uploader will be ready in {@link Fragment#onResume()}
  * @param <T>
  */
-public class PresenterLoader<T extends Presenter> extends Loader<T> {
+public class UploaderLoader<T extends UploadingPresenter> extends Loader<T> {
 
-    T presenter;
-    final PresenterFactory<T> presenterFactory;
+    T uploader;
+    final UploaderFactory<T> uploaderFactory;
 
     /**
      * Stores away the application context associated with context.
@@ -31,11 +33,11 @@ public class PresenterLoader<T extends Presenter> extends Loader<T> {
      * Activity instances.
      *
      * @param context used to retrieve the application context.
-     * @param presenterFactory
+     * @param uploaderFactory
      */
-    public PresenterLoader(Context context, PresenterFactory<T> presenterFactory) {
+    public UploaderLoader(Context context, UploaderFactory<T> uploaderFactory) {
         super(context);
-        this.presenterFactory = presenterFactory;
+        this.uploaderFactory = uploaderFactory;
     }
 
     @Override
@@ -43,21 +45,20 @@ public class PresenterLoader<T extends Presenter> extends Loader<T> {
         super.onStartLoading();
 
 
-        if (presenter != null) {
-            deliverResult(presenter);
+        if (uploader != null) {
+            deliverResult(uploader);
             return;
         }
 
-        deliverResult(presenter = presenterFactory.create());
+        deliverResult(uploader = uploaderFactory.create());
     }
 
     @Override
     protected void onReset() {
         super.onReset();
 
-        if (presenter != null) {
-            presenter.onDestroyed();
-            presenter = null;
+        if (uploader != null) {
+            uploader = null;
         }
     }
 }
