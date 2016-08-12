@@ -27,6 +27,14 @@ public class HintSpinnerAdapter<T> extends ArrayAdapter<T> {
         inflator = LayoutInflater.from(context);
     }
 
+    public HintSpinnerAdapter(@NonNull Context context, @LayoutRes int layoutId, @NonNull T[] objects, @NonNull String hint) {
+        super(context, layoutId, objects);
+
+        this.hint = hint;
+        this.dropdownLayoutId = this.layoutId = layoutId;
+        inflator = LayoutInflater.from(context);
+    }
+
     @Override
     public int getCount() {
         return super.getCount() + 1;
