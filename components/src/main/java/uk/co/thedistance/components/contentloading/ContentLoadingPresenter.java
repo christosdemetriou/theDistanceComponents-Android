@@ -23,8 +23,8 @@ import uk.co.thedistance.components.base.Presenter;
 public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends ContentLoadingPresenterView<T>> implements Presenter<PV> {
 
     protected PV view;
-    protected T content;
-    protected DS dataSource;
+    public T content;
+    public DS dataSource;
     protected Subscription dataSubscription;
     private SwipeRefreshLayout refreshLayout;
 
