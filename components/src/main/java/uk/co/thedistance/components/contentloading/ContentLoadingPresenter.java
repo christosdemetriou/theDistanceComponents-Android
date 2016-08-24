@@ -97,7 +97,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                 .subscribe(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
-
+                        showLoading(false, refresh);
                     }
 
                     @Override
@@ -111,7 +111,6 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                     public void onNext(T content) {
                         keepContent(content);
                         view.showContent(content, refresh);
-                        showLoading(false, refresh);
                     }
                 });
     }
