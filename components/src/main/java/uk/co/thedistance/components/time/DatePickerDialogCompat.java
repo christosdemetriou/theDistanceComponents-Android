@@ -8,6 +8,7 @@ import android.text.format.DateUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
@@ -84,7 +85,7 @@ public class DatePickerDialogCompat extends AlertDialog implements DialogInterfa
     public DatePickerDialogCompat(Context context, int theme, OnDateSetListener listener, int year,
                                   int monthOfYear, int dayOfMonth) {
         super(context, resolveDialogTheme(context, theme));
-
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         mDateSetListener = listener;
         mCalendar = Calendar.getInstance();
 
