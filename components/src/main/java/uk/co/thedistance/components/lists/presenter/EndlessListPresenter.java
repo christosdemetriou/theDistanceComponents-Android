@@ -1,6 +1,7 @@
 package uk.co.thedistance.components.lists.presenter;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -52,7 +53,7 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
     }
 
     @Override
-    public void onViewAttached(ListPresenterView<T> view) {
+    public void onViewAttached(@NonNull ListPresenterView<T> view) {
         super.onViewAttached(view);
 
         view.getRecyclerView().addOnScrollListener(SCROLL_LISTENER);

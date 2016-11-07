@@ -1,6 +1,7 @@
 package uk.co.thedistance.components.contentloading;
 
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ViewTreeObserver;
@@ -33,7 +34,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     }
 
     @Override
-    public void onViewAttached(PV view) {
+    public void onViewAttached(@NonNull PV view) {
         this.view = view;
         if (content != null) {
             view.showContent(content, true);
@@ -42,7 +43,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
         }
     }
 
-    public void onViewAttached(final PV view, final SwipeRefreshLayout refreshLayout) {
+    public void onViewAttached(final @NonNull PV view, final SwipeRefreshLayout refreshLayout) {
         this.refreshLayout = refreshLayout;
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -86,6 +87,10 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     public void loadContent(final boolean refresh) {
         unsubscribe();
 
+        if (view == null) {
+            return;
+        }
+
         if (refresh) {
             dataSource.reset();
         }
@@ -118,6 +123,9 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     private void showLoading(boolean show, boolean isRefresh) {
         if (isRefresh && refreshLayout != null) {
             refreshLayout.setRefreshing(show);
+            return;
+        }
+        if (view == null) {
             return;
         }
 
