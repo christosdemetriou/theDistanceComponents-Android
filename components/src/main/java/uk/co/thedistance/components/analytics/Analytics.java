@@ -24,8 +24,8 @@ public class Analytics {
     private String sCurrentScreen;
     private SharedPreferences sPreferences;
 
-    private final AnalyticsTracker tracker;
-    private boolean enabled = true;
+    protected final AnalyticsTracker tracker;
+    protected boolean enabled = true;
 
     public Analytics(Application application, AnalyticsTracker tracker) {
         this.tracker = tracker;
