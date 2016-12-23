@@ -23,7 +23,7 @@ import uk.co.thedistance.components.uploading.interfaces.UploadingPresenterView;
 public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extends UploadingPresenterView<RT>> implements Presenter<UV> {
 
     protected UV view;
-    protected DU dataUploader;
+    public DU dataUploader;
     protected Subscription dataSubscription;
 
     public UploadingPresenter(DU dataUploader) {
