@@ -78,6 +78,8 @@ public class DelayFrameLayout extends FrameLayout {
     public void hide() {
         mDismissed = true;
         removeCallbacks(mDelayedShow);
+        mPostedShow = false;
+
         long diff = System.currentTimeMillis() - mStartTime;
         if (diff >= MIN_SHOW_TIME || mStartTime == -1) {
             // The progress spinner has been shown long enough
