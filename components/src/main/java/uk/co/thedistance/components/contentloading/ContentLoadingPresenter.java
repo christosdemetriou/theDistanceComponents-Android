@@ -37,7 +37,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     public void onViewAttached(@NonNull PV view) {
         this.view = view;
         if (content != null) {
-            view.showContent(content, true);
+            view.showContent(content, false);
         } else {
             loadContent(true);
         }
