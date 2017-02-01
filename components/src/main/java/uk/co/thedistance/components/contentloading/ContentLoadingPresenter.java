@@ -1,10 +1,8 @@
 package uk.co.thedistance.components.contentloading;
 
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.ViewTreeObserver;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -51,17 +49,8 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                 loadContent(true);
             }
         });
-        refreshLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    refreshLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                } else {
-                    refreshLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-                onViewAttached(view);
-            }
-        });
+
+        onViewAttached(view);
     }
 
     @Override
