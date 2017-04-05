@@ -1,6 +1,6 @@
 package uk.co.thedistance.components.uploading.interfaces;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface DataUploader<T, RT> {
 

@@ -4,10 +4,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import uk.co.thedistance.components.base.Presenter;
 
 /**
@@ -24,7 +24,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     protected PV view;
     public T content;
     public DS dataSource;
-    protected Subscription dataSubscription;
+    protected Disposable dataSubscription;
     private SwipeRefreshLayout refreshLayout;
 
     public ContentLoadingPresenter(DS dataSource) {
@@ -85,20 +85,25 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
         }
         showLoading(true, refresh);
 
-        dataSubscription = dataSource.getData()
+        dataSource.getData()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<T>() {
-                    @Override
-                    public void onCompleted() {
-                        showLoading(false, refresh);
-                    }
-
+                .subscribe(new Observer<T>() {
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Error: ", e.getLocalizedMessage());
                         showLoading(false, refresh);
                         view.showError(e, e.getLocalizedMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        showLoading(false, refresh);
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        dataSubscription = d;
                     }
 
                     @Override
@@ -132,8 +137,8 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
     }
 
     private void unsubscribe() {
-        if (dataSubscription != null && !dataSubscription.isUnsubscribed()) {
-            dataSubscription.unsubscribe();
+        if (dataSubscription != null && !dataSubscription.isDisposed()) {
+            dataSubscription.dispose();
         }
     }
 }

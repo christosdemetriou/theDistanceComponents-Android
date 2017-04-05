@@ -1,6 +1,6 @@
 package uk.co.thedistance.components.contentloading;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface DataSource<T> {
 
