@@ -67,7 +67,7 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
     }
 
     private void loadNext() {
-        if (dataSubscription != null && !dataSubscription.isUnsubscribed()) {
+        if (dataSubscription != null && !dataSubscription.isDisposed()) {
             return;
         }
 

@@ -1,12 +1,11 @@
 package uk.co.thedistance.components.uploading;
 
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import uk.co.thedistance.components.base.Presenter;
 import uk.co.thedistance.components.contentloading.ContentLoadingPresenterView;
 import uk.co.thedistance.components.contentloading.DataSource;
@@ -14,7 +13,6 @@ import uk.co.thedistance.components.uploading.interfaces.DataUploader;
 import uk.co.thedistance.components.uploading.interfaces.UploadingPresenterView;
 
 /**
- *
  * @param <T>  The content type to be uploaded
  * @param <RT> The response type
  * @param <DU> The {@link DataUploader} responsible for uploading content
@@ -24,7 +22,7 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
 
     protected UV view;
     public DU dataUploader;
-    protected Subscription dataSubscription;
+    protected Disposable dataSubscription;
 
     public UploadingPresenter(DU dataUploader) {
         this.dataUploader = dataUploader;
@@ -37,7 +35,6 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
     /**
      * This method will attempt to load content from the {@link DataSource} and call the appropriate methods
      * on the {@link ContentLoadingPresenterView} in the event of errors or completion
-     *
      */
     public void uploadContent(T content) {
         unsubscribe();
@@ -46,12 +43,13 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
 
         showLoading(true);
 
-        dataSubscription = dataUploader.getUpload()
+        dataUploader.getUpload()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<RT>() {
+                .subscribe(new Observer<RT>() {
+
                     @Override
-                    public void onCompleted() {
+                    public void onComplete() {
 
                     }
 
@@ -61,6 +59,11 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
                         showLoading(false);
                         view.showError(e, e.getLocalizedMessage());
                         dataSubscription = null;
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        dataSubscription = d;
                     }
 
                     @Override
@@ -77,8 +80,8 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
     }
 
     private void unsubscribe() {
-        if (dataSubscription != null && !dataSubscription.isUnsubscribed()) {
-            dataSubscription.unsubscribe();
+        if (dataSubscription != null && !dataSubscription.isDisposed()) {
+            dataSubscription.dispose();
         }
     }
 
