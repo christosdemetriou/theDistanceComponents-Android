@@ -1,6 +1,6 @@
 package uk.co.thedistance.components.uploading.interfaces;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface DataUploader<T, RT> {
 
@@ -15,5 +15,5 @@ public interface DataUploader<T, RT> {
      * Provide an observable. Any manipulation of data
      * should be done here
      */
-    Observable<RT> getUpload();
+    Single<RT> getUpload();
 }

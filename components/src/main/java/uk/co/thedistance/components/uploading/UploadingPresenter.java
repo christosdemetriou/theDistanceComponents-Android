@@ -2,7 +2,7 @@ package uk.co.thedistance.components.uploading;
 
 import android.util.Log;
 
-import io.reactivex.Observer;
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -46,12 +46,7 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
         dataUploader.getUpload()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RT>() {
-
-                    @Override
-                    public void onComplete() {
-
-                    }
+                .subscribe(new SingleObserver<RT>() {
 
                     @Override
                     public void onError(Throwable e) {
@@ -67,7 +62,7 @@ public class UploadingPresenter<T, RT, DU extends DataUploader<T, RT>, UV extend
                     }
 
                     @Override
-                    public void onNext(RT response) {
+                    public void onSuccess(RT response) {
                         view.uploadComplete(response);
                         showLoading(false);
                         dataSubscription = null;
