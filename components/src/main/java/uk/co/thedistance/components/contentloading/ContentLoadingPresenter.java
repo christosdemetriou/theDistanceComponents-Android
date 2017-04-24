@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
-import io.reactivex.Observer;
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -88,7 +88,7 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
         dataSource.getData()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<T>() {
+                .subscribe(new SingleObserver<T>() {
                     @Override
                     public void onError(Throwable e) {
                         Log.d("Error: ", e.getLocalizedMessage());
@@ -97,17 +97,13 @@ public class ContentLoadingPresenter<T, DS extends DataSource<T>, PV extends Con
                     }
 
                     @Override
-                    public void onComplete() {
-                        showLoading(false, refresh);
-                    }
-
-                    @Override
                     public void onSubscribe(Disposable d) {
                         dataSubscription = d;
                     }
 
                     @Override
-                    public void onNext(T content) {
+                    public void onSuccess(T content) {
+                        showLoading(false, refresh);
                         keepContent(content);
                         view.showContent(content, refresh);
                     }

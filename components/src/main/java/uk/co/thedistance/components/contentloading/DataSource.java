@@ -1,6 +1,6 @@
 package uk.co.thedistance.components.contentloading;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface DataSource<T> {
 
@@ -13,5 +13,5 @@ public interface DataSource<T> {
      * Provide a pre-configured observable. Any manipulation of data
      * should be done here
      */
-    Observable<T> getData();
+    Single<T> getData();
 }
