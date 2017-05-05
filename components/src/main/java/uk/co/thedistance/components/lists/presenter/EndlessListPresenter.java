@@ -90,7 +90,7 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
         if (layoutManager instanceof LinearLayoutManager) {
-            return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition() == recyclerView.getAdapter().getItemCount() - 1 - endOffset;
+            return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition() >= recyclerView.getAdapter().getItemCount() - 1 - endOffset;
         }
 
         if (layoutManager instanceof StaggeredGridLayoutManager) {
