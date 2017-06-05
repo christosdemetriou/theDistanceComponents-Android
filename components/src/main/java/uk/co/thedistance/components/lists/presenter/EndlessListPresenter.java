@@ -29,9 +29,14 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
     }
 
     private int endOffset = 0;
+    private boolean inverted = false;
 
     public EndlessListPresenter(final DS dataSource) {
         super(dataSource);
+    }
+
+    public void setInverted(boolean inverted) {
+        this.inverted = inverted;
     }
 
     private final RecyclerView.OnScrollListener SCROLL_LISTENER = new RecyclerView.OnScrollListener() {
@@ -42,12 +47,22 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
                 return;
             }
 
-            loadNextIfBottom();
+            if (inverted) {
+                loadNextIfTop();
+            } else {
+                loadNextIfBottom();
+            }
         }
     };
 
     private void loadNextIfBottom() {
         if (!dataSource.isListComplete() && isScrolledToBottom(view.getRecyclerView())) {
+            loadNext();
+        }
+    }
+
+    private void loadNextIfTop() {
+        if (!dataSource.isListComplete() && isScrolledToTop(view.getRecyclerView())) {
             loadNext();
         }
     }
@@ -81,12 +96,16 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                loadNextIfBottom();
+                if (inverted) {
+                    loadNextIfTop();
+                } else {
+                    loadNextIfBottom();
+                }
             }
         }, 400);
     }
 
-    protected boolean isScrolledToBottom(RecyclerView recyclerView) {
+    private boolean isScrolledToBottom(RecyclerView recyclerView) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
         if (layoutManager instanceof LinearLayoutManager) {
@@ -106,5 +125,22 @@ public class EndlessListPresenter<T, DS extends ListDataSource<T>> extends ListP
         return false;
     }
 
+    private boolean isScrolledToTop(RecyclerView recyclerView) {
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 
+        if (layoutManager instanceof LinearLayoutManager) {
+            return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition() <= endOffset;
+        }
+
+        if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] positions = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
+            for (int i : positions) {
+                if (i <= endOffset) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
