@@ -1,1 +1,1 @@
-include ':components', ':slimmingworlddemo', ':pocketseodemo'
+include ':components'
